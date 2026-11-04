@@ -3,7 +3,7 @@
 Install NORG's edge-mirroring router on **your own** Fastly service. Everything
 runs in your Fastly account; NORG never receives your credentials.
 
-This is the Fastly port of the Cloudflare Worker in the root of this repo. Of
+This is the Fastly port of NORG's Cloudflare Worker. Of
 the ports it is the closest to the original — Fastly's runtime speaks standard
 `Request`/`Response`, has a real `waitUntil`, and ships the **same `lol-html`
 engine** behind Cloudflare's HTMLRewriter.
