@@ -31,6 +31,9 @@ import { SecretStore } from "fastly:secret-store";
  * deployable with its own pin; content-craft compares it against
  * EDGE_WORKER_VERSION_FASTLY.
  *
+ * 0.2.2 — brings in x-norg-public-host (0.1.4), which was on a separate branch:
+ * every origin fetch and passthrough tells the origin the visitor's hostname.
+ *
  * 0.2.0 — the same three moves as CloudFront 0.6.0. The page is never cached
  * at the edge: every page passthrough carries a pass override, only static
  * assets keep Fastly's cache. The router makes no call of its own to report a
@@ -40,7 +43,7 @@ import { SecretStore } from "fastly:secret-store";
  * before the feed is touched. Background work that remains — the stale-feed
  * refresh and the opt-in passthrough event — goes to event.waitUntil.
  */
-export const EDGE_SCRIPT_VERSION = "0.2.1";
+export const EDGE_SCRIPT_VERSION = "0.2.2";
 
 /** Names of the two stores this install expects. */
 export const CONFIG_STORE_NAME = "norg_edge_config";
