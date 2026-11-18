@@ -144,11 +144,29 @@ const MAX_INLINE_MIRROR_BYTES = 850 * 1024;
 
 
 /**
+ * Compare two strings without exiting at the first differing character.
+ *
+ * Length is checked first (a site key's length is public: every key has the
+ * same shape); content is XOR-accumulated so timing never reveals how much of
+ * a guess was right.
+ *
+ * @param {string} a First string.
+ * @param {string} b Second string.
+ * @returns {boolean} True when identical.
+ */
+function constantTimeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+/**
  * Is this an authenticated health probe rather than a real visit?
  *
- * The key comparison is not constant-time. A successful probe reveals only the
- * site id and script version, both of which the operator running the probe
- * already knows, so the simple comparison is deliberate.
+ * The key is compared in constant time (a probe header is the one place a
+ * caller can present guesses at the secret), so timing cannot reveal how much
+ * of a guess was right.
  *
  * @param {Request} request Incoming request.
  * @param {Object} env Install config.
@@ -161,7 +179,7 @@ function isHealthProbe(request, env) {
   // site key, so the documented curl no longer puts a NORG credential on the
   // wire.
   const probeKey = env.PROBE_HEADER;
-  return Boolean(probeKey && env.PROBE_TOKEN && probeKey === env.PROBE_TOKEN);
+  return Boolean(probeKey && env.PROBE_TOKEN && constantTimeEqual(probeKey, env.PROBE_TOKEN));
 }
 
 /**
