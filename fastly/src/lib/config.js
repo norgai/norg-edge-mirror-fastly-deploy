@@ -31,6 +31,10 @@ import { SecretStore } from "fastly:secret-store";
  * deployable with its own pin; content-craft compares it against
  * EDGE_WORKER_VERSION_FASTLY.
  *
+ * 0.2.3 — the health-probe key is compared in constant time (it was a plain
+ * ===, so a guess could be refined by timing); internal references scrubbed
+ * from comments. No behaviour change otherwise.
+ *
  * 0.2.2 — brings in x-norg-public-host (0.1.4), which was on a separate branch:
  * every origin fetch and passthrough tells the origin the visitor's hostname.
  *
@@ -43,7 +47,7 @@ import { SecretStore } from "fastly:secret-store";
  * before the feed is touched. Background work that remains — the stale-feed
  * refresh and the opt-in passthrough event — goes to event.waitUntil.
  */
-export const EDGE_SCRIPT_VERSION = "0.2.2";
+export const EDGE_SCRIPT_VERSION = "0.2.3";
 
 /** Names of the two stores this install expects. */
 export const CONFIG_STORE_NAME = "norg_edge_config";

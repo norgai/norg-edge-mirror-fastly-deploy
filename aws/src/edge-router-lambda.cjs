@@ -1307,9 +1307,15 @@ function reportPassthrough(env, request, classification) {
 // aws/lambda/edge-router-lambda.js
 var WATCHDOG_MS = 2e4;
 var MAX_INLINE_MIRROR_BYTES = 850 * 1024;
+function constantTimeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 function isHealthProbe(request, env) {
   const probeKey = env.PROBE_HEADER;
-  return Boolean(probeKey && env.PROBE_TOKEN && probeKey === env.PROBE_TOKEN);
+  return Boolean(probeKey && env.PROBE_TOKEN && constantTimeEqual(probeKey, env.PROBE_TOKEN));
 }
 function isPassthrough(request, env) {
   if (binding(env, "EDGE_DISABLED") === "true") return true;

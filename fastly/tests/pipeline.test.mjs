@@ -437,6 +437,20 @@ test("an authenticated health probe reports the install's state", async () => {
   assert.equal(body.version, "0.2.0");
 });
 
+test("a wrong or near-miss probe key is not answered as a health probe", async () => {
+  __test_setFeed(FEED);
+  for (const bad of [`${KEY}x`, KEY.slice(0, -1), "nek_live_testkex", "nope"]) {
+    const response = await handleRequest(
+      new Request("https://shop.example.com/", {
+        headers: { "x-norg-edge-check": bad, "user-agent": CHROME },
+      }),
+      makeEnv(),
+      VERIFIED_IP,
+    );
+    assert.ok(!(await response.text()).includes('"site_id"'), `key ${bad} must not reach the probe`);
+  }
+});
+
 // --- IPv6 source verification (workers/lib/cidr.mjs via core/agent.js) -------
 
 test("an IPv6 client inside the operator's published IPv6 range gets the mirror", async () => {

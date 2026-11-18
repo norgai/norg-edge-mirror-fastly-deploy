@@ -120,6 +120,24 @@ export function backendFetch(env) {
 }
 
 /**
+ * Compare two strings without exiting at the first differing character.
+ *
+ * Length is checked first (a site key's length is public: every key has the
+ * same shape); content is XOR-accumulated so timing never reveals how much of
+ * a guess was right.
+ *
+ * @param {string} a First string.
+ * @param {string} b Second string.
+ * @returns {boolean} True when identical.
+ */
+function constantTimeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+/**
  * Is this an authenticated health probe rather than a real visit?
  *
  * @param {Request} request Incoming request.
@@ -128,7 +146,7 @@ export function backendFetch(env) {
  */
 function isHealthProbe(request, env) {
   const probeKey = request.headers.get(HEALTH_CHECK_HEADER);
-  return Boolean(probeKey && env.NORG_SITE_KEY && probeKey === env.NORG_SITE_KEY);
+  return Boolean(probeKey && env.NORG_SITE_KEY && constantTimeEqual(probeKey, env.NORG_SITE_KEY));
 }
 
 /**
